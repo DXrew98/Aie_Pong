@@ -56,8 +56,8 @@ struct Ball {
 	float x = 400;
 	float y = 300;
 	float r = 5;
-	float xSpeed = -100;
-	float ySpeed = -100;
+	float xSpeed = 0;
+	float ySpeed = 0;
 };
 
 int drawBall(Ball ball) {
