@@ -7,26 +7,26 @@
 
 
 void setupPlayer(Player& player, int x, int y);
+
+int  playerMove(Player& player, char one, char two);
+int  playerLock(Player& player1, Player& player2, Walls box);
+int  playerScore(Ball& ball, Walls box, Player& player1, Player& player2);
+
+int  ballMove(Ball& ball);
+int  ballLock(Ball& ball, Walls box, Player player1, Player player2);
+
 void randomDirection(Ball& ball);
+int  gameReset(Ball& ball, Player player1, Player player2);
 
-int playerMove(Player& player, char one, char two);
-int playerLock(Player& player1, Player& player2, Walls box);
+int  main() {
+	Walls	box;
+	Ball	ball;
+	Player	player1;
+	Player	player2;
 
-int ballMove(Ball& ball);
-int ballLock(Ball& ball, Walls box, Player player1, Player player2);
+	char	choice;
+	float	delayTime = 0;
 
-int playerScore(Ball& ball, Walls box, Player& player1, Player& player2);
-int gameReset(Ball& ball, Player player1, Player player2);
-
-int main() {
-	Walls box;
-	Ball ball;
-	Player player1;
-	Player player2;
-
-	char choice;
-
-	float delayTime = 0;
 	srand(time(NULL));
 
 	//promt player 
@@ -72,7 +72,6 @@ int main() {
 			barrierBox(box);
 			gameDraw(ball, player1, player2);
 
-
 			if (player1.yBottom <= 0 || player2.yBottom <= 0) {
 				//terminate game
 				player1.yBottom = 100;
@@ -99,8 +98,7 @@ int main() {
 	}
 }
 
-
-int playerMove(Player & player, char one, char two) {
+int  playerMove(Player & player, char one, char two) {
 	
 	//run velocity through DeltaTime
 	player.xPos += xVel * sfw::getDeltaTime();
@@ -118,26 +116,45 @@ int playerMove(Player & player, char one, char two) {
 
 	return 0;
 }
-
-int playerLock(Player& player1, Player& player2, Walls box){
+int  playerLock(Player& player1, Player& player2, Walls box){
 
 	//keep paddels within boundrys
 	if (player1.yPos + player1.yBottom > box.y2)	{ player1.yPos = box.y2 - player1.yBottom; }
-	if (player1.yPos - 2 < box.y1)		{ player1.yPos = box.y1; }
+	if (player1.yPos - 2 < box.y1)					{ player1.yPos = box.y1; }
 	if (player2.yPos + player2.yBottom > box.y2)	{ player2.yPos = box.y2 - player2.yBottom; }
-	if (player2.yPos - 2  < box.y1)		{ player2.yPos = box.y1; }
+	if (player2.yPos - 2  < box.y1)					{ player2.yPos = box.y1; }
 
 	return 0;
 }
-
 void setupPlayer(Player& player, int x, int y) {
 
 	player.xPos = x;
 	player.yPos = y;
 
 }
+int  playerScore(Ball& ball, Walls box, Player& player1, Player& player2) {
 
-int ballMove(Ball& ball) {
+	//check for p1 to score
+	if (ball.x > box.x2) {
+		player2.yBottom -= 25;
+		player1.yBottom += 10;
+		score[0] += 1;
+		return 2;
+	}
+
+	//check for p2 to score
+	if (ball.x < box.x1) {
+		player1.yBottom -= 25;
+		player2.yBottom += 10;
+		score[1] += 1;
+		return 2;
+	}
+
+
+	return 0;
+}
+
+int  ballMove(Ball& ball) {
 	xAcc = ball.xSpeed;
 	yAcc = ball.ySpeed;
 
@@ -149,8 +166,7 @@ int ballMove(Ball& ball) {
 	
 	return 0;
 }
-
-int ballLock(Ball& ball, Walls box, Player playerL, Player playerR) {
+int  ballLock(Ball& ball, Walls box, Player playerL, Player playerR) {
 	
 	if (ball.y < box.y1) { ball.ySpeed *= -1; } //bounce off floor
 	if (ball.y > box.y2) { ball.ySpeed *= -1; } //bounce off ceiling
@@ -177,61 +193,12 @@ int ballLock(Ball& ball, Walls box, Player playerL, Player playerR) {
 	}
 	return 0;
 }
-
-int playerScore(Ball& ball, Walls box, Player& player1, Player& player2) {
-
-	//check for p1 to score
-	if (ball.x > box.x2) {
-		player2.yBottom -= 25;
-		player1.yBottom += 10;
-		score[0] += 1;
-		return 2;
-	}
-
-	//check for p2 to score
-	if (ball.x < box.x1) {
-		player1.yBottom -= 25;
-		player2.yBottom += 10;
-		score[1] += 1;
-		return 2;
-	}
-
-	
-	return 0;
-}
-
-int gameReset(Ball& ball, Player player1, Player player2) {
-
-	setupPlayer(player1, 10, 250);
-	setupPlayer(player2, 780, 250);
-	ball.x = 400;
-	ball.y = 300;
-	randomDirection(ball);
-
-	return 0;
-}
-
 void randomDirection(Ball& ball) {
 
 	//std::cout << rand() << " ";
 
 	float finalXSpeed = 0;
 	float finalYSpeed = 0;
-
-	//// 60Deg Constraint
-	//int ballDirection = (rand() % 60) - 30;
-	//int playerPick = rand() % 2;
-
-	//if (playerPick == 1) { ballDirection += 180; }
-
-	//ballDirection *= PI / 180;
-
-	//finalXSpeed += 200 * cos(ballDirection);
-	//finalYSpeed += 200 * sin(ballDirection);
-
-	//// apply the final speed to the ball
-	//ball.xSpeed = finalXSpeed;
-	//ball.ySpeed = finalYSpeed;
 
 	// calculate variances
 	finalXSpeed = (rand() % 200 + 140);
@@ -242,9 +209,18 @@ void randomDirection(Ball& ball) {
 	if ((rand() % 2) == 1)
 		finalYSpeed *= -1;
 
-
 	// apply the speeds
 	ball.xSpeed = finalXSpeed;
 	ball.ySpeed = finalYSpeed;
 }
 
+int  gameReset(Ball& ball, Player player1, Player player2) {
+
+	setupPlayer(player1, 10, 250);
+	setupPlayer(player2, 780, 250);
+	ball.x = 400;
+	ball.y = 300;
+	randomDirection(ball);
+
+	return 0;
+}
