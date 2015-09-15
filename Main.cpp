@@ -1,3 +1,4 @@
+#include <Windows.h>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -23,42 +24,78 @@ int main() {
 	Player player1;
 	Player player2;
 
+	char choice;
+
 	float delayTime = 0;
 	srand(time(NULL));
 
-	//Initialize game 
-	sfw::initContext(screenWidth, screenHight, "Pong");
-	
-	setupPlayer(player1, 10, 250);
-	setupPlayer(player2, 780, 250);
-	randomDirection(ball);
+	//promt player 
+	std::cout << "Pong!" << std::endl;
+	std::cout << "Player 1 uses the \"W\" and \"S\" keys to play" << std::endl;
+	std::cout << "Player 2 uses the \"I\" and \"K\" keys to play" << std::endl;
+	std::cout << "Cast the other player's paddle into oblivion to win!" << std::endl << std::endl;
+	std::cout << "Press \"b\" and the enter to begin!" << std::endl;
+	std::cin >> choice;
+	while (choice == 'b') {
 
-	
+		//initialize game 
+		sfw::initContext(screenWidth, screenHeight, "Pong");
 
-	while (sfw::stepContext())
-	{
-		std::cout << ball.xSpeed;
-		if (delayTime <= 0) {
-			delayTime = playerScore(ball, box, player1, player2);
 
-			playerMove(player1, 'w', 's');
-			playerMove(player2, 'i', 'k');
-			playerLock(player1, player2, box);
+		//setup game board		
+		setupPlayer(player1, 10, 250);
+		setupPlayer(player2, 780, 250);
+		randomDirection(ball);
+		//make game wait so player can ready
+		delayTime = 2;
 
-			ballMove(ball);
-			ballLock(ball, box, player1, player2);
-		}
-		else {
-			delayTime -= sfw::getDeltaTime();
-			if (delayTime <= 0) { gameReset(ball, player1, player2); }
-		}
+
+
+		while (sfw::stepContext())
+		{
+			if (delayTime <= 0) {
+				delayTime = playerScore(ball, box, player1, player2);
+
+				playerMove(player1, 'w', 's');
+				playerMove(player2, 'i', 'k');
+				playerLock(player1, player2, box);
+
+				ballMove(ball);
+				ballLock(ball, box, player1, player2);
+			}
+
+			else {
+				delayTime -= sfw::getDeltaTime();
+				if (delayTime <= 0) { gameReset(ball, player1, player2); }
+			}
+
 			barrierBox(box);
 			gameDraw(ball, player1, player2);
 
+
+			if (player1.yBottom <= 0 || player2.yBottom <= 0) {
+				//terminate game
+				sfw::termContext();
+				break;
+			}
+		}
+	system("cls");
+	for (int i = 0; i < 2; ++i) {
+		std::cout << "Player " << i + 1 << " Score = " << score[i] << std::endl;
 	}
-	//terminate game
-	sfw::termContext();
+
+	if (score[0] > score[1]) { std::cout << std::endl << "Player 1 wins!!!!" << std::endl; }
+	else { std::cout << std::endl << "Player 2 wins!!!!" << std::endl; }
+	std::cout << std::endl;
+
+	std::cout << "Press \"b\" and the enter to play again!" << std::endl;
+	std::cout << "Press \"x\" and the enter to exit!" << std::endl;
+	std::cin >> choice;
+
+	//system("pause");
+	}
 }
+
 
 int playerMove(Player & player, char one, char two) {
 	
@@ -142,14 +179,17 @@ int playerScore(Ball& ball, Walls box, Player& player1, Player& player2) {
 
 	//check for p1 to score
 	if (ball.x > box.x2) {
-		player2.yBottom -= 20;
-		player1.yBottom += 5;
+		player2.yBottom -= 25;
+		player1.yBottom += 10;
+		score[0] += 1;
 		return 2;
 	}
+
 	//check for p2 to score
 	if (ball.x < box.x1) {
-		player1.yBottom -= 20;
-		player2.yBottom += 5;
+		player1.yBottom -= 25;
+		player2.yBottom += 10;
+		score[1] += 1;
 		return 2;
 	}
 
@@ -170,11 +210,38 @@ int gameReset(Ball& ball, Player player1, Player player2) {
 
 void randomDirection(Ball& ball) {
 
-	int ballDirection = rand() % 360;
+	//std::cout << rand() << " ";
 
-	ballDirection *= PI / 180;
+	float finalXSpeed = 0;
+	float finalYSpeed = 0;
 
-	ball.xSpeed = 100 * cos(ballDirection);
-	ball.ySpeed = 100 * sin(ballDirection);
+	//// 60Deg Constraint
+	//int ballDirection = (rand() % 60) - 30;
+	//int playerPick = rand() % 2;
+
+	//if (playerPick == 1) { ballDirection += 180; }
+
+	//ballDirection *= PI / 180;
+
+	//finalXSpeed += 200 * cos(ballDirection);
+	//finalYSpeed += 200 * sin(ballDirection);
+
+	//// apply the final speed to the ball
+	//ball.xSpeed = finalXSpeed;
+	//ball.ySpeed = finalYSpeed;
+
+	// calculate variances
+	finalXSpeed = (rand() % 200 + 140);
+	finalYSpeed = (rand() % 100 + 50);
+
+	if ((rand() % 2) == 1)
+		finalXSpeed *= -1;
+	if ((rand() % 2) == 1)
+		finalYSpeed *= -1;
+
+
+	// apply the speeds
+	ball.xSpeed = finalXSpeed;
+	ball.ySpeed = finalYSpeed;
 }
 

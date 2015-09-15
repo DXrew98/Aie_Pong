@@ -1,10 +1,10 @@
 #pragma once
 #include "sfwdraw.h"
 
-const float screenWidth = 800, screenHight = 600;
+const float screenWidth = 800, screenHeight = 600;
 float xAcc = 0, yAcc = 0;			//acceleration
 float xVel = 0, yVel = 0;			//velocity
-int p1Score = 0, p2Score = 0;
+int score[2] = { 0, 0 };
 
 
 struct Walls
@@ -21,8 +21,8 @@ int barrierBox(Walls box) {
 	//draw barrier box
 	sfw::drawLine(box.x1, box.y1,	screenWidth, box.y1);	//top
 	sfw::drawLine(box.x1, box.y2,	screenWidth, box.y2);	//bottom
-	sfw::drawLine(box.x1, box.y1,	box.x1,	screenHight);	//left
-	sfw::drawLine(box.x2, box.y1,	box.x2,	screenHight);	//right
+	sfw::drawLine(box.x1, box.y1,	box.x1,	screenHeight);	//left
+	sfw::drawLine(box.x2, box.y1,	box.x2,	screenHeight);	//right
 
 	return 0;
 }
