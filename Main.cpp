@@ -75,6 +75,8 @@ int main() {
 
 			if (player1.yBottom <= 0 || player2.yBottom <= 0) {
 				//terminate game
+				player1.yBottom = 100;
+				player2.yBottom = 100;
 				sfw::termContext();
 				break;
 			}
@@ -91,6 +93,7 @@ int main() {
 	std::cout << "Press \"b\" and the enter to play again!" << std::endl;
 	std::cout << "Press \"x\" and the enter to exit!" << std::endl;
 	std::cin >> choice;
+	if (choice == 'b') continue;
 
 	//system("pause");
 	}
