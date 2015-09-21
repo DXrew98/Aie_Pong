@@ -9,7 +9,7 @@ int			score[2] = { 0, 0 };
 
 struct	Walls
 {
-	//wall Pos
+	//wall Position
 	float x1 = 0;
 	float x2 = 799;
 	float y1 = 1;
